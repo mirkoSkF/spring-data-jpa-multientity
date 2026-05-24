@@ -1,0 +1,35 @@
+{
+  "nome": "Mirko",
+  "cognome": "Onorato",
+  "codiceFiscale": "NRCMRK85A01F205Z",
+  "genere": "MASCHIO",
+  "dataDiNascita": "1985-01-01",
+  "luogoNascita": "Napoli",
+  "ruolo": {
+    "id": 1
+  },
+  "account": {
+    "username": "mirko.test",
+    "password": "SecretPassword123"
+  },
+  "contatti": [
+    {
+      "tipoContatto": {
+        "id": 2
+      },
+      "valore": "+393331234567"
+    }
+  ],
+  "titoliStudio": [
+    {
+      "titoloStudio": {
+        "id": 1
+      }
+    },
+    {
+      "titoloStudio": {
+        "id": 2
+      }
+    }
+  ]
+}
