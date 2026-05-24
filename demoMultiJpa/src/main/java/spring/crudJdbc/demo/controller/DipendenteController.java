@@ -12,15 +12,18 @@ public class DipendenteController {
 
     private final DipendenteRepository repository;
 
+    // Injection tramite costruttore
     public DipendenteController(DipendenteRepository repository) {
         this.repository = repository;
     }
 
+    // READ ALL
     @GetMapping
     public Iterable<Dipendente> getAll() {
         return repository.findAll();
     }
 
+    // READ BY ID
     @GetMapping("/{id}")
     public ResponseEntity<Dipendente> getById(@PathVariable Long id) {
         return repository.findById(id)
@@ -28,18 +31,21 @@ public class DipendenteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // CREATE
     @PostMapping
     public ResponseEntity<Dipendente> create(@RequestBody Dipendente dipendente) {
+        // Garantiamo la INSERT azzerando l'ID primario dell'aggregato
         dipendente.setId(null);
         Dipendente saved = repository.save(dipendente);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<Dipendente> update(@PathVariable Long id, @RequestBody Dipendente dettagliDipendente) {
         return repository.findById(id).map(dipendenteEsistente -> {
             
-            // 1. Aggiornamento dati anagrafici base
+            // 1. Aggiornamento attributi anagrafici diretti
             dipendenteEsistente.setNome(dettagliDipendente.getNome());
             dipendenteEsistente.setCognome(dettagliDipendente.getCognome());
             dipendenteEsistente.setCodiceFiscale(dettagliDipendente.getCodiceFiscale());
@@ -47,13 +53,12 @@ public class DipendenteController {
             dipendenteEsistente.setDataDiNascita(dettagliDipendente.getDataDiNascita());
             dipendenteEsistente.setLuogoNascita(dettagliDipendente.getLuogoNascita());
             
-            // 2. Aggiornamento relazione Ruolo
+            // 2. Aggiornamento relazione ManyToOne (Ruolo)
             dipendenteEsistente.setRuolo(dettagliDipendente.getRuolo());
             
-            // 3. Gestione Account per BLOCCARE l'auto-incremento dell'ID
+            // 3. Allineamento OneToOne (Account) - Evita il salto dell'auto-increment su DB
             if (dettagliDipendente.getAccount() != null) {
                 if (dipendenteEsistente.getAccount() != null) {
-                    // Mantieni fermo lo stesso identico ID di prima sul DB
                     dettagliDipendente.getAccount().setId(dipendenteEsistente.getAccount().getId());
                 }
                 dipendenteEsistente.setAccount(dettagliDipendente.getAccount());
@@ -61,24 +66,27 @@ public class DipendenteController {
                 dipendenteEsistente.setAccount(null);
             }
             
-            // 4. Aggiornamento Contatti (Svuota e ripopola per far lavorare il cascade orfani)
+            // 4. Aggiornamento delle liste orfane (Contatti)
             dipendenteEsistente.getContatti().clear();
             if (dettagliDipendente.getContatti() != null) {
                 dipendenteEsistente.getContatti().addAll(dettagliDipendente.getContatti());
             }
             
-            // 5. Aggiornamento Titoli Studio
+            // 5. Aggiornamento ManyToMany diretto (Titoli di Studio)
+            // Svuotando e ripopolando, Hibernate si occupa di fare le giuste INSERT/DELETE nella tabella 'dipendenti_titoli'
             dipendenteEsistente.getTitoliStudio().clear();
             if (dettagliDipendente.getTitoliStudio() != null) {
                 dipendenteEsistente.getTitoliStudio().addAll(dettagliDipendente.getTitoliStudio());
             }
             
+            // Salva lo stato sincronizzato dell'entità gestita
             Dipendente updated = repository.save(dipendenteEsistente);
             return ResponseEntity.ok(updated);
             
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!repository.existsById(id)) {
