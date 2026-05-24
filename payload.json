@@ -15,21 +15,29 @@
   "contatti": [
     {
       "tipoContatto": {
+        "id": 1
+      },
+      "valore": "mirko.onorato@edu.skillfactory.it"
+    },
+    {
+      "tipoContatto": {
         "id": 2
       },
       "valore": "+393331234567"
+    },
+    {
+      "tipoContatto": {
+        "id": 3
+      },
+      "valore": "+390815551234"
     }
   ],
   "titoliStudio": [
     {
-      "titoloStudio": {
-        "id": 1
-      }
+      "id": 1
     },
     {
-      "titoloStudio": {
-        "id": 2
-      }
+      "id": 2
     }
   ]
 }
