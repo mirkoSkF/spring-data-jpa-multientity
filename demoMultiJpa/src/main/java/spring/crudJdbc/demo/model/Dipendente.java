@@ -36,17 +36,39 @@ public class Dipendente {
     @OneToOne(mappedBy = "dipendente", cascade = CascadeType.ALL, orphanRemoval = true)
     private Account account;
 
-    // Relazione 1-to-N con l'entità di giunzione Contatti
+    // Relazione 1-to-N con l'entità dei Contatti (mantenuta perché contiene la colonna 'valore')
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "dipendente_id")
     private List<Contatto> contatti = new ArrayList<>();
 
-    // Relazione 1-to-N verso l'entità di giunzione dei Titoli di Studio
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "dipendente_id")
-    private List<DipendenteTitolo> titoliStudio = new ArrayList<>();
+    // TRASFORMATA IN @ManyToMany: Mappa direttamente la tabella di giunzione senza classe intermedia
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "dipendenti_titoli",
+        joinColumns = @JoinColumn(name = "dipendente_id"),
+        inverseJoinColumns = @JoinColumn(name = "titolo_studio_id")
+    )
+    private List<TitoloStudio> titoliStudio = new ArrayList<>();
 
+    // Costruttore vuoto (Obbligatorio per JPA)
     public Dipendente() {}
+
+    // Costruttore pieno aggiornato
+    public Dipendente(Long id, String nome, String cognome, String codiceFiscale, String genere, 
+                      LocalDate dataDiNascita, String luogoNascita, RuoloAziendale ruolo, 
+                      Account account, List<Contatto> contatti, List<TitoloStudio> titoliStudio) {
+        this.id = id;
+        this.nome = nome;
+        this.cognome = cognome;
+        this.codiceFiscale = codiceFiscale;
+        this.genere = genere;
+        this.dataDiNascita = dataDiNascita;
+        this.luogoNascita = luogoNascita;
+        this.ruolo = ruolo;
+        this.setAccount(account);
+        this.contatti = contatti;
+        this.titoliStudio = titoliStudio;
+    }
 
     // Getter e Setter
     public Long getId() { return id; }
@@ -84,6 +106,6 @@ public class Dipendente {
     public List<Contatto> getContatti() { return contatti; }
     public void setContatti(List<Contatto> contatti) { this.contatti = contatti; }
 
-    public List<DipendenteTitolo> getTitoliStudio() { return titoliStudio; }
-    public void setTitoliStudio(List<DipendenteTitolo> titoliStudio) { this.titoliStudio = titoliStudio; }
+    public List<TitoloStudio> getTitoliStudio() { return titoliStudio; }
+    public void setTitoliStudio(List<TitoloStudio> titoliStudio) { this.titoliStudio = titoliStudio; }
 }
