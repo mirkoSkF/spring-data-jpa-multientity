@@ -1,0 +1,11 @@
+-- ATTENZIONE!
+--INSERIRE QUESTI RECORD PRIMA DI EFFETTUARE LE OPERAZIONI POST E PUT SUL DIPENDENTE!!!
+INSERT INTO ruoli_aziendali (id, denominazione) VALUES (1, 'Software Engineer') ON DUPLICATE KEY UPDATE denominazione=denominazione;
+INSERT INTO ruoli_aziendali (id, denominazione) VALUES (2, 'Team Leader') ON DUPLICATE KEY UPDATE denominazione=denominazione;
+
+INSERT INTO titoli_studio (id, descrizione) VALUES (1, 'Laurea in Informatica') ON DUPLICATE KEY UPDATE descrizione=descrizione;
+INSERT INTO titoli_studio (id, descrizione) VALUES (2, 'Master DevOps') ON DUPLICATE KEY UPDATE descrizione=descrizione;
+
+INSERT INTO tipi_contatti (id, denominazione) VALUES (1, 'EMAIL') ON DUPLICATE KEY UPDATE denominazione=denominazione;
+INSERT INTO tipi_contatti (id, denominazione) VALUES (2, 'TELEFONO') ON DUPLICATE KEY UPDATE denominazione=denominazione;
+INSERT INTO tipi_contatti (id, denominazione) VALUES (3, 'FACEBOOK') ON DUPLICATE KEY UPDATE denominazione=denominazione;
