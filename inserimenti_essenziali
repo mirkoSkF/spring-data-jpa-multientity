@@ -1,5 +1,5 @@
 -- ATTENZIONE!
---INSERIRE QUESTI RECORD PRIMA DI EFFETTUARE LE OPERAZIONI POST E PUT SUL DIPENDENTE!!!
+-- INSERIRE QUESTI RECORD PRIMA DI EFFETTUARE LE OPERAZIONI POST E PUT SUL DIPENDENTE!!!
 INSERT INTO ruoli_aziendali (id, denominazione) VALUES (1, 'Software Engineer') ON DUPLICATE KEY UPDATE denominazione=denominazione;
 INSERT INTO ruoli_aziendali (id, denominazione) VALUES (2, 'Team Leader') ON DUPLICATE KEY UPDATE denominazione=denominazione;
 
