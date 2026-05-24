@@ -27,22 +27,23 @@ public class Dipendente {
     @Column(name = "luogo_nascita")
     private String luogoNascita;
 
-    // Relazione N-to-1 con Ruolo
+    // Relazione N-to-1 con Ruolo (Tabella dizionario: nessuna cascata per evitare sovrascritture dei ruoli esistenti)
     @ManyToOne
     @JoinColumn(name = "ruolo_id")
     private RuoloAziendale ruolo;
 
-    // Relazione 1-to-1 con Account (con cascade per salvare/aggiornare insieme al dipendente)
+    // Relazione 1-to-1 con Account (con cascade totale e orphanRemoval per sincronizzare la cancellazione dell'account)
     @OneToOne(mappedBy = "dipendente", cascade = CascadeType.ALL, orphanRemoval = true)
     private Account account;
 
-    // Relazione 1-to-N con l'entità dei Contatti (mantenuta perché contiene la colonna 'valore')
+    // Relazione 1-to-N con i Contatti (le righe di contatto sono dipendenti logici del singolo dipendente)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "dipendente_id")
     private List<Contatto> contatti = new ArrayList<>();
 
-    // TRASFORMATA IN @ManyToMany: Mappa direttamente la tabella di giunzione senza classe intermedia
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    // CORRETTO: Rimosso CascadeType.PERSIST per evitare l'errore "Detached entity passed to persist" 
+    // quando si associano titoli di studio preesistenti (tabelle dizionario/anagrafica)
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
         name = "dipendenti_titoli",
         joinColumns = @JoinColumn(name = "dipendente_id"),
@@ -50,10 +51,10 @@ public class Dipendente {
     )
     private List<TitoloStudio> titoliStudio = new ArrayList<>();
 
-    // Costruttore vuoto (Obbligatorio per JPA)
+    // Costruttore vuoto (Obbligatorio per le specifiche JPA)
     public Dipendente() {}
 
-    // Costruttore pieno aggiornato
+    // Costruttore pieno completo
     public Dipendente(Long id, String nome, String cognome, String codiceFiscale, String genere, 
                       LocalDate dataDiNascita, String luogoNascita, RuoloAziendale ruolo, 
                       Account account, List<Contatto> contatti, List<TitoloStudio> titoliStudio) {
@@ -65,7 +66,7 @@ public class Dipendente {
         this.dataDiNascita = dataDiNascita;
         this.luogoNascita = luogoNascita;
         this.ruolo = ruolo;
-        this.setAccount(account);
+        this.setAccount(account); // Sfrutta il setter per mantenere la coerenza bidirezionale
         this.contatti = contatti;
         this.titoliStudio = titoliStudio;
     }
@@ -99,7 +100,7 @@ public class Dipendente {
     public void setAccount(Account account) {
         this.account = account;
         if (account != null) {
-            account.setDipendente(this);
+            account.setDipendente(this); // Garantisce la consistenza della relazione bidirezionale 1:1
         }
     }
 
